@@ -1,0 +1,202 @@
+{
+  "name": "locai",
+  "displayName": "locai",
+  "description": "Send and receive text with kobold-API compatible AI",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.77.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "locai.ask.ai",
+        "title": "Locai: Ask AI"
+      },
+      {
+        "command": "locai.ask.explain",
+        "title": "Locai: Ask AI to explain"
+      }
+    ],
+    "configuration": {
+      "title": "LocAI",
+      "properties": {
+        "locai.uri": {
+          "type": "string",
+          "default": "ws://localhost:5005/api/v1/stream",
+          "title": "URL",
+          "description": "URL to Kobold API compatbible service (use --api in oobabooga)."
+        },
+        "locai.prompt.default": {
+          "type": "array",
+          "default": [
+            "{{SEL}}",
+            "### Response:"
+          ],
+          "title": "Default prompt",
+          "description": "Multi-line prompt. {{SEL}} will be replaced with selected text, {{LANG}} for the current language)"
+        },
+        "locai.prompt.explain": {
+          "type": "array",
+          "default": [
+            "Explain the following code",
+            "```",
+            "{{SEL}}",
+            "```",
+            "### Response:"
+          ],
+          "title": "Prompt for asking the explanation",
+          "description": "Multi-line prompt for asking the explanation. {{SEL}} will be replaced with selected text, {{LANG}} for the current language)"
+        },
+        "locai.max_new_tokens": {
+          "type": "integer",
+          "default": 250,
+          "minimum": 1,
+          "maximum": 2000,
+          "title": "Max new tokens"
+        },
+        "locai.truncation_length": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 2048,
+          "description": "The leftmost tokens are removed if the prompt exceeds this length. Most models require this to be at most 2048."
+        },
+        "locai.seed": {
+          "type": "integer",
+          "default": -1,
+          "description": "Seed (-1 for random)"
+        },
+        "locai.stopping_strings": {
+          "type": "array",
+          "title": "Stopping strings",
+          "description": "Stop generation if model generates the given string(s)",
+          "default": [
+            "### User:"
+          ]
+        },
+        "locai.do_sample": {
+          "type": "boolean",
+          "default": true,
+          "title": "Do sample"
+        },
+        "locai.temperature": {
+          "type": "number",
+          "default": 1.3,
+          "title": "Temperature",
+          "description": "Primary factor to control randomness of outputs. 0 = deterministic (only the most likely token is used). Higher value = more randomness."
+        },
+        "locai.top_p": {
+          "type": "number",
+          "default": 0.1,
+          "title": "Top-p",
+          "description": "If not set to 1, select tokens with probabilities adding up to less than this number. Higher value = higher range of possible random results."
+        },
+        "locai.top_k": {
+          "type": "integer",
+          "default": 40,
+          "title": "Top-K",
+          "description": "Similar to Top-p, but select instead only the top_k most likely tokens. Higher value = higher range of possible random results."
+        },
+        "locai.typical_p": {
+          "type": "number",
+          "default": 1,
+          "title": "Temperature",
+          "description": "If not set to 1, select only tokens that are at least this much more likely to appear than random tokens, given the prior text."
+        },
+        "locai.repetition_penalty": {
+          "type": "number",
+          "default": 1.18,
+          "title": "Temperature",
+          "description": "Exponential penalty factor for repeating prior tokens. 1 means no penalty, higher value = less repetition, lower value = more repetition."
+        },
+        "locai.min_length": {
+          "type": "integer",
+          "default": 0,
+          "title": "Min length",
+          "description": "Minimum generation length in tokens."
+        },
+        "locai.no_repeat_ngram_size": {
+          "type": "integer",
+          "default": 0,
+          "title": "no_repeat_ngram_size",
+          "description": "If not set to 0, specifies the length of token sets that are completely blocked from repeating at all. Higher values = blocks larger phrases, lower values = blocks words or letters from repeating. Only 0 or high values are a good idea in most cases."
+        },
+        "locai.penalty_alpha": {
+          "type": "number",
+          "default": 0,
+          "maximum": 5,
+          "title": "penalty_alpha",
+          "description": "Contrastive search"
+        },
+        "locai.num_beams": {
+          "type": "integer",
+          "default": 0,
+          "maximum": 20,
+          "title": "num_beams",
+          "description": "Beam search (uses a lot of VRAM)"
+        },
+        "locai.length_penalty": {
+          "type": "number",
+          "default": 1,
+          "minimum": -5,
+          "maximum": 5,
+          "title": "length_penalty",
+          "description": "Beam search (uses a lot of VRAM)"
+        },
+        "locai.early_stopping": {
+          "type": "boolean",
+          "default": false,
+          "title": "early_stopping"
+        },
+        "locai.add_bos_token": {
+          "type": "boolean",
+          "default": true,
+          "title:": "Add the bos_token to the beginning of prompts",
+          "description": "Disabling this can make the replies more creative."
+        },
+        "locai.ban_eos_token": {
+          "type": "boolean",
+          "default": false,
+          "title:": "Ban the eos_token",
+          "description": "Forces the model to never end the generation prematurely."
+        },
+        "locai.skip_special_tokens": {
+          "type": "boolean",
+          "default": true,
+          "title:": "Skip special tokens",
+          "description": "Some specific models need this unset."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.77.0",
+    "@types/ws": "^8.5.4",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.39.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "ws": "^8.12.0"
+  }
+}
