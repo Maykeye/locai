@@ -136,7 +136,7 @@
         },
         "locai.num_beams": {
           "type": "integer",
-          "default": 0,
+          "default": 1,
           "maximum": 20,
           "title": "num_beams",
           "description": "Beam search (uses a lot of VRAM)"
