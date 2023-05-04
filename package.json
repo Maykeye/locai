@@ -2,7 +2,7 @@
   "name": "locai",
   "displayName": "locai",
   "description": "Send and receive text with kobold-API compatible AI",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.77.0"
   },

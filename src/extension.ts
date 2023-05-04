@@ -115,8 +115,6 @@ export function activate(context: vscode.ExtensionContext) {
 		ask_ai(activity, "locai.prompt.explain");
 	});
 
-
-
 	context.subscriptions.push(abort, ask, explain);
 }
 
