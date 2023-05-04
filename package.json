@@ -20,6 +20,10 @@
       {
         "command": "locai.ask.explain",
         "title": "Locai: Ask AI to explain"
+      },
+      {
+        "command": "locai.abort",
+        "title": "Locai: Abort AI generation"
       }
     ],
     "configuration": {
@@ -34,8 +38,7 @@
         "locai.prompt.default": {
           "type": "array",
           "default": [
-            "{{SEL}}",
-            "### Response:"
+            "{{SEL}}"
           ],
           "title": "Default prompt",
           "description": "Multi-line prompt. {{SEL}} will be replaced with selected text, {{LANG}} for the current language)"
@@ -46,8 +49,7 @@
             "Explain the following code",
             "```",
             "{{SEL}}",
-            "```",
-            "### Response:"
+            "```"
           ],
           "title": "Prompt for asking the explanation",
           "description": "Multi-line prompt for asking the explanation. {{SEL}} will be replaced with selected text, {{LANG}} for the current language)"

@@ -4,10 +4,29 @@
 import * as vscode from 'vscode';
 import { WebSocket } from 'ws';
 
-function ask_ai(prompt_key: string, channel: vscode.OutputChannel) {
-	const config = vscode.workspace.getConfiguration('locai');
+class Activity {
+	socket: WebSocket | null = null;
+	channel: vscode.OutputChannel;
+	config: vscode.WorkspaceConfiguration;
+
+	constructor(
+		channel: vscode.OutputChannel,
+		config: vscode.WorkspaceConfiguration
+	) {
+		this.channel = channel;
+		this.config = config;
+	}
+
+}
+
+function ask_ai(activity: Activity, prompt_key: string) {
+	const config = activity.config;
 	const uri = config.get("locai.uri", "ws://localhost:5005/api/v1/stream");
-	const prompt_format = config.get(prompt_key, ["{{SEL}}\n### Response:"]).join("\n");
+	const prompt_format_maybe = config.get(prompt_key, null);
+	if (!prompt_format_maybe) {
+		activity.channel.appendLine("*** no prompt for " + prompt_key + ", using defaul: {{SEL}}");
+	}
+	const prompt_format = (prompt_format_maybe || ["{{SEL}}"]).join("\n");
 	const editor = vscode.window.activeTextEditor;
 	const document = editor?.document;
 	const codeSelection = editor?.selection;
@@ -39,45 +58,66 @@ function ask_ai(prompt_key: string, channel: vscode.OutputChannel) {
 		skip_special_tokens: config.get("locai.skip_special_tokens", true),
 		stopping_strings: config.get("locai.stopping_strings", [])
 	};
-	const socket = new WebSocket(uri);
-	socket.on("open", () => {
-		channel.clear();
-		channel.append(prompt);
-		socket.send(JSON.stringify(request));
+	if (activity.socket) {
+		activity.socket.close();
+	}
+	activity.socket = new WebSocket(uri);
+	activity.socket.on("open", () => {
+		activity.channel.clear();
+		activity.channel.append(prompt);
+		activity.socket?.send(JSON.stringify(request));
 	});
-	socket.on("message", (data, isBinary) => {
-		if (isBinary) { socket.close(); console.error("Binary"); return; }
+	activity.socket.on("message", (data, isBinary) => {
+		if (isBinary) {
+			activity.channel.appendLine("*** Unexected binary data received. Aborting");
+			activity.socket?.close();
+			activity.socket = null;
+			return;
+		}
 		const json = JSON.parse(data.toString());
 		if (json.event === "stream_end") {
-			socket.close();
-			channel.appendLine("");
-			channel.appendLine("");
+			activity.socket?.close();
+			activity.channel.appendLine("");
+			activity.channel.appendLine("");
 			return;
 		}
 		if (json.event === "text_stream") {
-			channel.append(json.text);
+			activity.channel.append(json.text);
 			return;
 		}
 		console.error("Unknown data: " + json);
 	});
+	activity.socket?.on("error", (err: Error) => {
+		activity.channel.appendLine("*** ERROR:" + err.message);
+		activity.socket = null;
+	});
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	const config = vscode.workspace.getConfiguration('locai');
 	const channel = vscode.window.createOutputChannel("Locai");
 	channel.show();
 
-	let config = vscode.workspace.getConfiguration('locai');
-	let ask = vscode.commands.registerCommand('locai.ask.ai', () => {
-		ask_ai("locai.prompt.default", channel);
+	const activity = new Activity(channel, config);
+	const abort = vscode.commands.registerCommand('locai.abort', () => {
+		if (activity.socket) {
+			channel.appendLine("\n*** Aborting generation\n");
+			activity.socket.close();
+			activity.socket = null;
+		}
 	});
 
-	let explain = vscode.commands.registerCommand('locai.ask.explain', () => {
-		ask_ai("locai.prompt.explain", channel);
+	const ask = vscode.commands.registerCommand('locai.ask.ai', () => {
+		ask_ai(activity, "locai.prompt.default");
+	});
+
+	const explain = vscode.commands.registerCommand('locai.ask.explain', () => {
+		ask_ai(activity, "locai.prompt.explain");
 	});
 
 
 
-	context.subscriptions.push(ask, explain);
+	context.subscriptions.push(abort, ask, explain);
 }
 
 // This method is called when your extension is deactivated
