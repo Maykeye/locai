@@ -2,7 +2,18 @@
 
 ## Features
 
-Can connect via weboscket to locally running API and query it.
+Extension MUST BE MANUALLY ACTIVATED BEFORE IT WILL WORK.
+
+Can connect via http to locally running API and query it.
+
+Will not trigger until manually queried. 
+Define `editor.action.inlineSuggest.trigger` in keyboard shortcuts.
+
+Result can be trimmed line by line and for first line word by word.
+Use alt-[ alt-] to loop 
+
+Press TAB to insert 
+
 
 (TODO
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
@@ -10,20 +21,25 @@ Can connect via weboscket to locally running API and query it.
 
 ## Requirements
 
-Kobold-compatible api must be running.
-Oobabooga must be run with --api and without --no-stream
+Oobabooga or other OpenAI compatible local tool must be running and open on 5000 port
 
 ## Extension Settings
 
-Make sure to edit prompts.
-{{SEL}} will be replaced with currently selected text (or whole document if nothing is selected)
-{{LANG}} will be replaced with currrent language
+DISABLED FOR NOW
 
 ## Known Issues
 
-Not tested.
+Not tested with anything but ooba
 
 ## Release Notes
+
+### 0.0.3alpha
+
+Migrated API to Ooba OAI compatibility layer.
+ws replaced by axios.
+99% of the code is rewritten from scratch
+
+Now Extension MUST BE MANUALLY ACTIVATED BEFORE IT WILL WORK.
 
 ### 0.0.1
 

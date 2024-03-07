@@ -1,8 +1,8 @@
 {
   "name": "locai",
   "displayName": "locai",
-  "description": "Send and receive text with kobold-API compatible AI",
-  "version": "0.0.2",
+  "description": "Send and receive text with OpenAI-like AOU to use in conjuction with Ooba",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.77.0"
   },
@@ -31,7 +31,7 @@
       "properties": {
         "locai.uri": {
           "type": "string",
-          "default": "ws://localhost:5005/api/v1/stream",
+          "default": "NOTUSED",
           "title": "URL",
           "description": "URL to Kobold API compatbible service (use --api in oobabooga)."
         },
@@ -198,7 +198,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "ws": "^8.12.0"
+    "axios": "^1.6.7"
   },
   "repository": {
     "type": "git",
