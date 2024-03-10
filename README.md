@@ -40,6 +40,7 @@ Not tested with anything but ooba
 * ws replaced by axios.
 * 99% of the code is rewritten from scratch
 * Now Extension MUST BE MANUALLY ACTIVATED BEFORE IT WILL WORK.
+* Extension must be triggereed manually using `editor.action.inlineSuggest.trigger` (I remapped Ctrl+\ taking it away from splitting)
 
 ### 0.0.1
 
