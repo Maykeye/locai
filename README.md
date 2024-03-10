@@ -33,13 +33,13 @@ Not tested with anything but ooba
 
 ## Release Notes
 
-### 0.0.3alpha
+### 0.0.3
 
-Migrated API to Ooba OAI compatibility layer.
-ws replaced by axios.
-99% of the code is rewritten from scratch
-
-Now Extension MUST BE MANUALLY ACTIVATED BEFORE IT WILL WORK.
+* Added support for local server on 13333 that takes whole text, position and produces the text from there (locai-server on my github)
+* Migrated API to Ooba OAI compatibility layer.
+* ws replaced by axios.
+* 99% of the code is rewritten from scratch
+* Now Extension MUST BE MANUALLY ACTIVATED BEFORE IT WILL WORK.
 
 ### 0.0.1
 

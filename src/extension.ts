@@ -7,10 +7,28 @@ import * as vscode from 'vscode';
 const axios = require('axios');
 
 
+async function ask_ai_smart(document: vscode.TextDocument, pos: vscode.Position) {
+	// A function that sends whole document and position to local server and lets it process data
+
+	let documentText = document.getText(); // TODO: handle empty doc? or leave to server-side locai?
+
+	// TODO: config me
+	const context: any = {
+		"code": documentText,
+		"line": pos.line,
+		"col": pos.character,
+		"n_tokens": 32
+	};
+
+	// TODO: config me
+	let post_result = await axios.post("http://127.0.0.1:13333/gen", context);
+	let response = post_result.data;
+	let text = response.generation;
+	return text;
+}
 
 async function ask_ai(document: vscode.TextDocument, pos: vscode.Position) {
 
-	const useSmartServer = false;   // TODO: pass text to the server along with the position
 	const stringLengthLimit = 1024; // TODO: trim me
 
 	let documentText = document.getText(); // TODO: handle empty doc? or edge case -- return?
@@ -66,7 +84,10 @@ export function activate(context: vscode.ExtensionContext) {
 			// TODO: query after N seconds for 5..10 tokens in context ~128 tokens?
 			// TODO: cache (pos, current-line to not rerun query in case user was busy fighting with intellinsense)
 			if (context.triggerKind === vscode.InlineCompletionTriggerKind.Invoke) {
-				const result: string = await ask_ai(document, position);
+				const use_locai_server = true; // TODO: CONFIG
+				const result = use_locai_server
+					? await ask_ai_smart(document, position)
+					: await ask_ai(document, position);
 				items.push(new vscode.InlineCompletionItem(result, new vscode.Range(position, position)));
 
 				// Split by lines
